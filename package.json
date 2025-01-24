@@ -6,9 +6,9 @@
     "fmt-check": "npx prettier --check --plugin=prettier-plugin-solidity '{script,src,test}/**/*.sol'"
   },
   "devDependencies": {
-    "prettier": "3.3.3",
-    "prettier-plugin-solidity": "1.4.1",
-    "solhint": "5.0.3",
+    "prettier": "3.4.2",
+    "prettier-plugin-solidity": "1.4.2",
+    "solhint": "5.0.5",
     "solhint-plugin-prettier": "0.1.0"
   }
 }

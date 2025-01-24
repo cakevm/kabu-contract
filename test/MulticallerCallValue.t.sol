@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.15;
 
-import "foundry-huff/HuffDeployer.sol";
+import "foundry-huff-neo/HuffNeoDeployer.sol";
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
@@ -21,7 +21,7 @@ contract MulticallerCallValueTest is Test, Helper {
         erc20Mock2 = new ERC20();
         console.log(address(erc20Mock));
         console.log(address(erc20Mock2));
-        multicaller = MultiCaller(HuffDeployer.deploy("Multicaller"));
+        multicaller = MultiCaller(HuffNeoDeployer.deploy("src/Multicaller.huff"));
         console.log(address(multicaller));
         vm.deal(address(multicaller), 1000000);
     }

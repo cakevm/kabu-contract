@@ -20,9 +20,7 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
-      - uses: huff-language/huff-toolchain@v2
-        with:
-          version: nightly
+      - uses: cakevm/huff-neo-toolchain@v1
 
       - run: forge install
       - run: make anvil &

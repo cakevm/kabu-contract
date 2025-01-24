@@ -1,6 +1,6 @@
 pragma solidity ^0.8.15;
 
-import "foundry-huff/HuffDeployer.sol";
+import "foundry-huff-neo/HuffNeoDeployer.sol";
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
@@ -71,7 +71,7 @@ contract TestHelper is Test {
     ShibaswapV2Pair public shibaMock;
 
     function setUp() public {
-        multicaller = MultiCaller(HuffDeployer.deploy("Multicaller"));
+        multicaller = MultiCaller(HuffNeoDeployer.deploy("src/Multicaller.huff"));
         vm.etch(MULTICALLER, address(multicaller).code);
 
         multicaller = MultiCaller(MULTICALLER);

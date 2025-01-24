@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.20;
 
-import "foundry-huff/HuffDeployer.sol";
+import "foundry-huff-neo/HuffNeoDeployer.sol";
 import "forge-std/Script.sol";
 
 interface MultiCaller {
@@ -17,13 +17,11 @@ interface MultiCaller {
 
 contract Deploy is Script {
     function run() external returns (address deployedAddress) {
-        bytes memory bytecode = HuffDeployer.config().creation_code("Multicaller");
-        vm.stopPrank();
-        vm.startBroadcast();
+        bytes memory bytecode = HuffNeoDeployer.config().creation_code("src/Multicaller.huff");
+
         assembly {
             let val := 0
             deployedAddress := create(val, add(bytecode, 0x20), mload(bytecode))
         }
-        vm.stopBroadcast();
     }
 }

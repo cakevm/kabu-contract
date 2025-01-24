@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.15;
 
-import "foundry-huff/HuffDeployer.sol";
+import "foundry-huff-neo/HuffNeoDeployer.sol";
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
@@ -25,7 +25,7 @@ contract MulticallerCallbackTest is Test, Helper, TestHelper {
         bytes memory callData2 = abi.encodeWithSignature("balanceOf(address)", addr);
         bytes memory callDataArray = abi.encodePacked(
             mergeData(address(erc20Mock), callData, ZERO_VALUE_CALL_SELECTOR, 0xFFFFFF, 0xFFFFFF),
-            mergeData(address(erc20Mock), callData2, ZERO_VALUE_CALL_SELECTOR,  0xFFFFFF, EncodeReturnStack(1, 0 , 0x0, 0x20 ))
+            mergeData(address(erc20Mock), callData2, ZERO_VALUE_CALL_SELECTOR, 0xFFFFFF, EncodeReturnStack(1, 0, 0x0, 0x20))
         );
 
         bytes memory callDoCallsData = abi.encodeWithSignature("doCalls(bytes)", callDataArray);
@@ -33,7 +33,6 @@ contract MulticallerCallbackTest is Test, Helper, TestHelper {
         bytes memory ret = multicaller.unlockCallback(removeSignature(callDoCallsData));
         //assertEq(ret, bytes(""));
     }
-
 
     function testCallErcInsideUni2CallbackArray2() public {
         console.log("testCallErcInsideUni2CallbackArray");
