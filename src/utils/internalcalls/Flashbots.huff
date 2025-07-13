@@ -1,4 +1,4 @@
-#include "Error.huff"
+#include "../Error.huff"
 
 
 #define macro TRANSFER_TIPS_MIN_BALANCE() = takes(0) returns(0) {
@@ -48,7 +48,7 @@
   dup3 0x44 add mload  // [tips, minbalance, token, offset]
 
   dup3 // [token, tips, minbalance, token, offset]
-  STATIC_CALL_TOKEN_BALANCE_MINUS_ONE(error) // [balance, token, tips, minbalance, token, offset]
+  STATIC_CALL_TOKEN_BALANCE_MINUS_ONE() // [balance, token, tips, minbalance, token, offset]
   
   dup1 dup5           // [minbalance, balance, balance, token, tips, minbalance, token, offset]
   gt iszero ok jumpi  // [balance, token, tips, minbalance, token, offset]]
@@ -90,7 +90,7 @@
   //dup4 0x44 add mload // [tips, minbalance, token, offset]
 
   dup3 // [token, tips, minbalance, token, offset]
-  STATIC_CALL_TOKEN_BALANCE_MINUS_ONE(error) // [balance, token, tips, minbalance, token, offset]
+  STATIC_CALL_TOKEN_BALANCE_MINUS_ONE() // [balance, token, tips, minbalance, token, offset]
   dup1 dup5  // [minbalance, balance, balance, token, tips, minbalance, token, offset]
 
   gt iszero ok jumpi // [balance, token, tips, minbalance, token, offset]]

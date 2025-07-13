@@ -1,4 +1,4 @@
-#include "./utils/VMOpcodes.huff"
+#include "utils/VMOpcodes.huff"
 
 #define macro DO_CALCULATION_CALL() = takes(2) returns(1) {
     // [prefix, offset, offset, buflen, .....]

@@ -1,4 +1,4 @@
-name: Multicaller
+name: CI
 
 on:
   push:

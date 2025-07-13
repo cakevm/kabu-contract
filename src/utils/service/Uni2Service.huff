@@ -1,4 +1,4 @@
-#include "utils/internalcalls/Uni2.huff"
+#include "../internalcalls/Uni2.huff"
 
  #define macro UNI2_QUICK_RETURN_IN_AMOUNT() = takes(1) returns(0) {
     0x84 calldataload 

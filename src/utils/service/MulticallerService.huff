@@ -34,7 +34,7 @@
     0x04 calldataload                       // [token]
 
     // Get the balance of this contract
-    STATIC_CALL_TOKEN_BALANCE_MINUS_ONE(error)        // [balance, token]
+    STATIC_CALL_TOKEN_BALANCE_MINUS_ONE()        // [balance, token]
 
     // Call token.transfer(msg.sender, balance)
     __FUNC_SIG(transfer) 0x00 mstore    // [balance, token]
