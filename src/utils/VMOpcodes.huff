@@ -288,9 +288,10 @@
       op23: // DWORD 32
         OPCODE_LOAD_CONST(0x5, 0xFFFFFFFF)
         next jump
-      op23: // QDWORD 64
-        OPCODE_LOAD_CONST(0x9, 0xFFFFFFFFFFFFFFFF)
-        next jump
+      // TODO: Fix this
+      //op23: // QDWORD 64
+      //  OPCODE_LOAD_CONST(0x9, 0xFFFFFFFFFFFFFFFF)
+      //  next jump
       op24: // 2QDWORD 112
         OPCODE_LOAD_CONST(0x7, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
@@ -324,9 +325,10 @@
       op33: // DWORD 32
         OPCODE_CONST(and, 0xFFFFFFFF)
         next jump
-      op33: // QDWORD 64
-        OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFF)
-        next jump
+      // TODO: Fix this
+      //op33: // QDWORD 64
+      //  OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFF)
+      //  next jump
       op34: // 2QDWORD 112
         OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump

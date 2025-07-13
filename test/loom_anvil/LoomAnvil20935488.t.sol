@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import "../Interface.sol";
-import "foundry-huff/HuffDeployer.sol";
+import "foundry-huff-neo/HuffNeoDeployer.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract LoomAnvil20935488 is Test {
@@ -33,7 +33,7 @@ contract LoomAnvil20935488 is Test {
         vm.label(0x465dbC39F46f9D43C581a5d90A43e4a0F2A6fF2d, "ito");
         vm.label(0xCEb67a66c2c8a90980dA3A50A3F96c07525a26Cb, "kabosu");
 
-        MultiCaller multicaller = MultiCaller(HuffDeployer.deploy("Multicaller"));
+        MultiCaller multicaller = MultiCaller(HuffNeoDeployer.deploy("src/Multicaller.huff"));
         bytes memory code = address(multicaller).code;
         vm.etch(UNDER_TEST, code);
 

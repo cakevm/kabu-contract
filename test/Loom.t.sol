@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 
 import "./mocks/ERC20.sol";
 import "./Interface.sol";
-import "foundry-huff/HuffDeployer.sol";
+import "foundry-huff-neo/HuffNeoDeployer.sol";
 import {Test, console} from "forge-std/Test.sol";
 
 contract TestLoom is Test {
@@ -21,7 +21,7 @@ contract TestLoom is Test {
         uint forkId = vm.createFork(rpc, hex"7f35c37787d9b6ba1ad2c72b5996d62bb5c0abe62521db0fa4f7e44459cd4803"); // TX before
         vm.selectFork(forkId);
 
-        MultiCaller multicaller = MultiCaller(HuffDeployer.deploy("Multicaller"));
+        MultiCaller multicaller = MultiCaller(HuffNeoDeployer.deploy("src/Multicaller.huff"));
         bytes memory code = address(multicaller).code;
         vm.etch(UNDER_TEST, code);
 
