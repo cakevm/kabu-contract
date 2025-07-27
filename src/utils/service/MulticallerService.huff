@@ -4,6 +4,8 @@
 /// @notice Stack Output: [balance, token]
 #define constant _WETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
 
+#define function balanceOf(address) view returns (uint256)
+#define function transfer(address,uint256) nonpayable returns ()
 
 #define macro STATIC_CALL_TOKEN_BALANCE_MINUS_ONE() = takes (1) returns (2) {
     // Static Call token.balanceOf(address(this))

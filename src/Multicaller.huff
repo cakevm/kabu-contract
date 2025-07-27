@@ -10,27 +10,6 @@
 #include "DelegateCall.huff"
 #include "InternalCall.huff"
 
-/* Interface */
-#define function setValue(uint256) nonpayable returns ()
-#define function getValue() view returns (uint256)
-#define function doCalls(bytes calldata data) payable returns()
-
-#define function isValidSignature(bytes calldata,bytes calldata) pure returns (bytes4)
-#define function isValidSignature(bytes32,bytes calldata) pure returns (bytes4)
-#define function uniswapV3SwapCallback(int256,int256,bytes calldata) nonpayable returns()
-#define function receiveFlashLoan(address[],uint256[],uint256[],bytes calldata) nonpayable returns()
-#define function transferTipsMinBalance(address,uint256,uint256,address) payable returns()
-#define function transferTipsMinBalanceWETH(uint256,uint256,address) payable returns()
-
-// bytes4 internal constant ERC20_TRANSFER_ID = 0xa9059cbb;
-#define function transfer(address, uint256) nonpayable returns ()
-// bytes4 internal constant PAIR_SWAP_ID = 0x022c0d9f;
-#define function swap(uint256, uint256, address, bytes) nonpayable returns ()
-#define function balanceOf(address) view returns (uint256)
-#define function transfer(address,uint256) nonpayable returns ()
-
-#define constant _OWNER                      = FREE_STORAGE_POINTER()
-#define constant _VALUE_LOCATION             = FREE_STORAGE_POINTER()
 #define constant _ADDRESS_MASK               = 0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff
 #define constant _CALL_LENGTH_MASK           = 0x000000000000000000000000000000000000000000000000000000000000ffff
 #define constant _CALL_VALUE_MASK            = 0x000000000000000000000000000000000000000000000000000000000000ffff
@@ -120,7 +99,7 @@
     // Identify which function is being called.
     0x00 calldataload 0xE0 shr
 
-    dup1 __FUNC_SIG(doCalls)                                                 eq docalls          jumpi
+    dup1 __FUNC_SIG("doCalls(bytes)")                                        eq docalls          jumpi
     dup1 __FUNC_SIG("uniswapV3SwapCallback(int256,int256,bytes)")            eq uni3docalls      jumpi
     dup1 __FUNC_SIG("pancakeV3SwapCallback(int256,int256,bytes)")            eq uni3docalls      jumpi
     dup1 __FUNC_SIG("callFunction(address,(address,uint256),bytes)")         eq dydxdocalls      jumpi
@@ -305,8 +284,6 @@
     exit:
 }
 
-
-
 #define macro DECODE_NEXT_CALL() = takes(1) returns(1) {
     // [offset, offset, buflen]
     dup1                              // [offset, offset]
@@ -383,7 +360,6 @@
         0xFFFF add
     exit_dnc:
 }
-
 
 #define macro DOCALLS() = takes(1) returns(0) {
     // [offset]

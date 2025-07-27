@@ -10,10 +10,10 @@
 
 </div>
 
-The Kabu contract allows to interact with DEX pools in a very efficient way for e.g. arbitrage. The contract is written in Huff using [huff-neo](https://github.com/cakevm/huff-neo) and used by [Kabu](https://github.com/cakevm/kabu).
+The Kabu contract allows to interact with DEX pools for the Kabu backrunning bot. The contract is written in Huff using [huff-neo](https://github.com/cakevm/huff-neo) and used by [Kabu](https://github.com/cakevm/kabu).
 
 ## Getting Started
-First install [Foundry](https://github.com/foundry-rs/foundry) and the [Huff Neo Compiler](https://github.com/cakevm/huff-neo). Then clone this repository:
+Clone this repository:
 ```sh
 git clone --recurse-submodules git@github.com:cakevm/kabu-contract.git
 ```
@@ -28,12 +28,6 @@ and
 ```sh
 export MAINNET_HTTP=<Your mainnet http endpoint>
 make test
-```
-
-### Deploy local
-Start your local anvil, add the private key from anvil to `deploy.sh` and deploy the contract using:
-```sh
-./deploy.sh
 ```
 
 ## Acknowledgements
