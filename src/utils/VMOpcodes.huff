@@ -1,3 +1,18 @@
+// =============================================================================
+// VIRTUAL MACHINE OPCODES
+// =============================================================================
+// Custom stack-based VM for performing calculations within the multicaller
+// Supports arithmetic, comparisons, memory operations, and stack manipulation
+// 
+// Opcode ranges:
+// 0x01-0x0F: Memory load operations
+// 0x10-0x1F: Arithmetic operations  
+// 0x20-0x2F: Constant loads
+// 0x30-0x3F: Bitwise masks
+// 0x40-0x4F: Comparisons and assertions
+// 0x50-0x5F: Aggregation operations
+// =============================================================================
+
 #include "Error.huff"
 
 #define macro OPCODE(op) = takes(0) returns(0) {
@@ -26,7 +41,6 @@
         <op>
         0x1
 }
-
 
 #define macro OPCODE_CMP_REVERT(op, exitlabel) = takes(0) returns(0) {
         pop
@@ -63,7 +77,6 @@
         not_ok:
 }
 
-
 #define macro OPCODE_ISZERO_NOT_REVERT(exitlabel) = takes(0) returns(0) {
         pop
         swap1
@@ -74,7 +87,6 @@
         not_ok:
 }
 
-
 #define macro OPCODE_STACK_ONE(op) = takes(0) returns(0) {
         pop
         swap1
@@ -82,23 +94,21 @@
         0x1
 }
 
-
 #define macro OPCODE_STACK_ARG8(op) = takes(0) returns(0) {
-        pop // [offset, ..stack]
-        dup1 0x1 add mload 0xF8 shr // [arg, offset, ..stack]
-        swap1 // [offset, arg, ..stack]
-        swap2 // [value, arg, offset, ..stack]
-        
+        pop                                   // [offset, ..stack]
+        dup1 0x1 add mload 0xF8 shr           // [arg, offset, ..stack]
+        swap1                                 // [offset, arg, ..stack]
+        swap2                                 // [value, arg, offset, ..stack]
         swap1
         <op>
         0x2
 }
 
 #define macro OPCODE_STACK_CONST(op, const) = takes(0) returns(0) {
-        pop // [offset, ..stack]
-        swap1 // [value, offset, ..stack]
-        <const> // [const, value, offset, ..stack]
-        swap1 // [value, const offset, ..stack]
+        pop                                   // [offset, ..stack]
+        swap1                                 // [value, offset, ..stack]
+        <const>                               // [const, value, offset, ..stack]
+        swap1                                 // [value, const offset, ..stack]
         <op>
         0x1
 }
@@ -110,14 +120,11 @@
         <size>
 }
 
-
-
 #define macro DO_CALCULATIONS() = takes(1) returns(1) {
-      //[offset]
-      //dup1 //[offset, offset]
+      // [offset]
       start:
       dup1 mload 
-      0xF8 shr //[opcode, offset]
+      0xF8 shr                                // [opcode, offset]
       
       dup1 iszero exitvmop jumpi
 
@@ -188,7 +195,6 @@
         next jump
 
       ops10:
-
       0x20 dup2 lt iszero ops20 jumpi
 
       dup1 0x11 eq op11 jumpi 
@@ -255,10 +261,8 @@
         OPCODE_STACK_TWO_REVERSE(div)
         next jump
 
-
     ops20:
       0x30 dup2 lt iszero ops30 jumpi
-
 
       dup1 0x20 eq op20 jumpi 
       dup1 0x21 eq op21 jumpi 
@@ -272,42 +276,41 @@
       exitvmop jump
 
       op20:
-        pop // [offset]
-        dup1 0x1 add //[offset]
+        pop                                   // [offset]
+        dup1 0x1 add                          // [offset]
         mload
         0x21
         next jump
       exitvmop jump
 
-      op21: //BYTE
+      op21:                                   // BYTE
         OPCODE_LOAD_CONST(0x2, 0xFF)
         next jump
-      op22: // WORD
+      op22:                                   // WORD
         OPCODE_LOAD_CONST(0x3, 0xFFFF)
         next jump
-      op23: // DWORD 32
+      op23:                                   // DWORD 32
         OPCODE_LOAD_CONST(0x5, 0xFFFFFFFF)
         next jump
       // TODO: Fix this
-      //op23: // QDWORD 64
+      //op23:                                 // QDWORD 64
       //  OPCODE_LOAD_CONST(0x9, 0xFFFFFFFFFFFFFFFF)
       //  next jump
-      op24: // 2QDWORD 112
+      op24:                                   // 2QDWORD 112
         OPCODE_LOAD_CONST(0x7, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
-      op25: // 2QDWORD 128
+      op25:                                   // 2QDWORD 128
         OPCODE_LOAD_CONST(0x9, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
-      op26: // 2QDWORD 160
+      op26:                                   // 2QDWORD 160
         OPCODE_LOAD_CONST(0xD, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
-      op2A: // MUL -1 (NEG)
+      op2A:                                   // MUL -1 (NEG)
         OPCODE_STACK_CONST(mul, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
     
     ops30:
       0x30 dup2 lt iszero ops40 jumpi
-      //dup1 0x30 eq op30 jumpi 
       dup1 0x31 eq op31 jumpi 
       dup1 0x32 eq op32 jumpi
       dup1 0x33 eq op33 jumpi
@@ -316,26 +319,26 @@
       pop
       exitvmop jump
 
-      op31: //BYTE
+      op31:                                   // BYTE
         OPCODE_CONST(and, 0xFF)
         next jump
-      op32: // WORD
+      op32:                                   // WORD
         OPCODE_CONST(and, 0xFFFF)
         next jump
-      op33: // DWORD 32
+      op33:                                   // DWORD 32
         OPCODE_CONST(and, 0xFFFFFFFF)
         next jump
       // TODO: Fix this
-      //op33: // QDWORD 64
+      //op33:                                 // QDWORD 64
       //  OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFF)
       //  next jump
-      op34: // 2QDWORD 112
+      op34:                                   // 2QDWORD 112
         OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
-      op35: // 2QDWORD 128
+      op35:                                   // 2QDWORD 128
         OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
-      op36: // 2QDWORD 160
+      op36:                                   // 2QDWORD 160
         OPCODE_CONST(and, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         next jump
 
@@ -362,106 +365,97 @@
 
       op40: 
         OPCODE_CMP_REVERT(eq, next)
-        __RIGHTPAD(0x4551) //EQ
+        __RIGHTPAD(0x4551)                    // EQ
         0x2
-        //dup1 0x0 mstore 0x20 0x0 revert
         PANIC()
       op41: 
         OPCODE_CMP_NOT_REVERT(eq, next)
-        __RIGHTPAD(0x4E4551) //NEQ
+        __RIGHTPAD(0x4E4551)                  // NEQ
         0x3
         PANIC()
       op42: 
         OPCODE_CMP_REVERT(lt, next)
-        __RIGHTPAD(0x4C54) //LT
+        __RIGHTPAD(0x4C54)                    // LT
         0x2
         PANIC()
       op43: 
         OPCODE_CMP_NOT_REVERT(lt, next)
-        __RIGHTPAD(0x475445) //GTE
+        __RIGHTPAD(0x475445)                  // GTE
         0x3
         PANIC()
       op44: 
         OPCODE_CMP_REVERT(gt, next)
-        __RIGHTPAD(0x4754) // GT 
+        __RIGHTPAD(0x4754)                    // GT
         0x2
         PANIC()
       op45: 
         OPCODE_CMP_NOT_REVERT(gt, next)
-        __RIGHTPAD(0x4C5445) // LTE
+        __RIGHTPAD(0x4C5445)                  // LTE
         0x3
         PANIC()
       op46: 
         OPCODE_ISZERO_REVERT(next)
-        __RIGHTPAD(0x5A52) // ZR
+        __RIGHTPAD(0x5A52)                    // ZR
         0x2
         PANIC()
       op47: 
         OPCODE_ISZERO_NOT_REVERT(next)
-        __RIGHTPAD(0x4E5A52) // NZR
+        __RIGHTPAD(0x4E5A52)                  // NZR
         0x3
         PANIC()
 
       op48: 
         OPCODE_CMP_REVERT(eq, next)
-        //0x4551 0x0 mstore // EQ
-        0x0 0x0 mstore // EQ
+        0x0 0x0 mstore                        // EQ
         0x20 0x0 return
       op49: 
         OPCODE_CMP_NOT_REVERT(eq, next)
-        //0x4E4551 0x0 mstore //NEQ
-        0x0 0x0 mstore // EQ
+        0x0 0x0 mstore                        // EQ
         0x20 0x0 return
       op4A: 
         OPCODE_CMP_REVERT(lt, next)
-        //0x4C54 0x0 mstore //LT
-        0x0 0x0 mstore // EQ
+        0x0 0x0 mstore                        // EQ
         0x20 0x0 return
       op4B: 
         OPCODE_CMP_NOT_REVERT(lt, next)
-        //0x4E5445 0x0 mstore //GTE
-        0x0 0x0 mstore // EQ
+        0x0 0x0 mstore                        // EQ
         0x20 0x0 return
       op4C: 
         OPCODE_CMP_REVERT(gt, next)
-        //0x4754 0x0 mstore // GT 
-        0x0 0x0 mstore // EQ
+        0x0 0x0 mstore                        // EQ
         0x20 0x0 return
       op4D: 
         OPCODE_CMP_NOT_REVERT(gt, next)
-        //0x4C5445 0x0 mstore // LTE
-        0x0 0x0 mstore // EQ
+        0x0 0x0 mstore                        // EQ
         0x20 0x0 return
       op4E: 
         OPCODE_ISZERO_REVERT(next)
-        //0x5A52 0x0 mstore // ZR
-        0x0 0x0 mstore // ZR
+        0x0 0x0 mstore                        // ZR
         0x20 0x0 return
       op4F: 
         OPCODE_ISZERO_NOT_REVERT(next)
-        //0x4E0A52 0x0 mstore // NZR
-        0x0 0x0 mstore // NZR
+        0x0 0x0 mstore                        // NZR
         0x20 0x0 return
 
       exitvmop jump
 
   ops50:
       0x60 dup2 lt iszero ops60 jumpi
-      dup1 0x50 eq op50 jumpi // SUM_POP
-      dup1 0x51 eq op51 jumpi // SUM
+      dup1 0x50 eq op50 jumpi                // SUM_POP
+      dup1 0x51 eq op51 jumpi                // SUM
       pop
       exitvmop jump
-    op50: // SUM_POP
-        pop // [offset, ..stack]
-        dup1 0x1 add mload 0xF8 shr // [counter, offset, ..stack]
+    op50:                                     // SUM_POP
+        pop                                   // [offset, ..stack]
+        dup1 0x1 add mload 0xF8 shr           // [counter, offset, ..stack]
         dup1 0x5 shl
-        0x0 mload // // [stack_offset, counter << 5, counter, offset, ..stack]
-        sub dup1 0x0 mstore // [new_stack_offset]
+        0x0 mload                             // [stack_offset, counter << 5, counter, offset, ..stack]
+        sub dup1 0x0 mstore                   // [new_stack_offset]
         0x0
         op50_loop:
         swap1 0x20 add swap1  
-        dup2 mload // [value, sum, new_stack_offset, counter]
-        add // [sum, new_stack_offset, counter]
+        dup2 mload                            // [value, sum, new_stack_offset, counter]
+        add                                   // [sum, new_stack_offset, counter]
         swap2 0x1 swap1 sub swap2
 
         dup3 iszero iszero op50_loop jumpi
@@ -470,14 +464,14 @@
         pop         
         0x2 
         next jump
-    op51: // SUM_POP
-        pop // [offset, ..stack]
-        dup1 0x1 add mload 0xF8 shr // [counter, offset, ..stack]
-        0x0 mload // // [stack_offset, counter, offset, ..stack]
+    op51:                                     // SUM
+        pop                                   // [offset, ..stack]
+        dup1 0x1 add mload 0xF8 shr           // [counter, offset, ..stack]
+        0x0 mload                             // [stack_offset, counter, offset, ..stack]
         0x0
-        op51_loop: //[sum, new_stack_offset, counter]
-        dup2 mload // [value, sum, new_stack_offset, counter]
-        add // [sum, new_stack_offset, counter]
+        op51_loop:                            // [sum, new_stack_offset, counter]
+        dup2 mload                            // [value, sum, new_stack_offset, counter]
+        add                                   // [sum, new_stack_offset, counter]
         swap1 0x20 swap1 sub swap1  
         swap2 0x1 swap1 sub swap2
 
@@ -488,19 +482,16 @@
         0x2 
         next jump
   ops60:
-
       pop
       exitvmop jump
 
     next:
-
       swap1
       swap2
       add
       start jump
     
     exitvmop:
-
       pop
       pop
 

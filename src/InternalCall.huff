@@ -71,18 +71,15 @@
        4B       20B     32B     32B
 */
 
-
-
 #define macro DO_INTERNAL_CALL() = takes(1) returns (1) {
     // [prefix, offset]
-    dup1                     // [prefix, prefix, offset]
-    // [_ADDRESS_MASK] and   // [target, prefix, offset]
-    0xA0 shr                 // [prefix >> 0xA0, target, prefix, offset]
-    [_CALL_LENGTH_MASK] and  // [length, target, prefix, offset]
+    dup1                                      // [prefix, prefix, offset]
+    0xA0 shr                                  // [prefix >> 0xA0, target, prefix, offset]
+    [_CALL_LENGTH_MASK] and                   // [length, target, prefix, offset]
     dup3 
     0xC add
     mload 
-    0xE0 shr // [selector, length, target, prefix, offset]
+    0xE0 shr                                  // [selector, length, target, prefix, offset]
 
     dup1 __FUNC_SIG("transferTipsMinBalanceNoPayout(address,uint256,uint256)") eq transfertipsnopayout   jumpi
     dup1 __FUNC_SIG("transferTipsMinBalance(address,uint256,uint256,address)") eq transfertips           jumpi
@@ -100,53 +97,53 @@
     dup1 __FUNC_SIG("logStackOffset(uint256)")                                 eq log_stack_offset       jumpi
     dup1 __FUNC_SIG("revertArg(uint256)")                                      eq revert_arg             jumpi
 
-    0x9999 0x0 mstore 0x20 0x0 revert // RevertDebug
+    0x9999 0x0 mstore 0x20 0x0 revert        // RevertDebug
     
     uni2getinamount0:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_IN_AMOUNT_FROM_0()
         exit jump
     uni2getinamount1:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_IN_AMOUNT_FROM_1()
         exit jump
     uni2getoutamount0:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_OUT_AMOUNT_FROM_0()
         exit jump
     uni2getoutamount1:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_OUT_AMOUNT_FROM_1()
         exit jump
 
     uni2getinamount0comms:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_IN_AMOUNT_FROM_0_COMMS()
         exit jump
     uni2getinamount1comms:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_IN_AMOUNT_FROM_1_COMMS()
         exit jump
     uni2getoutamount0comms:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_OUT_AMOUNT_FROM_0_COMMS()
         exit jump
     uni2getoutamount1comms:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         UNI2_GET_OUT_AMOUNT_FROM_1_COMMS()
@@ -154,29 +151,28 @@
 
 
     transfertips:
-        pop // [length, prefix, offset] 
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         TRANSFER_TIPS_MIN_BALANCE()
         pop
-
         exit jump
     transfertipsnopayout:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         TRANSFER_TIPS_MIN_BALANCE_NO_PAYOUT()
         exit jump
 
     transfertipsweth:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         TRANSFER_TIPS_MIN_BALANCE_WETH()
         exit jump
 
     log_arg:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         LOG_PARSE_ARG()
@@ -184,16 +180,15 @@
         pop
         exit jump
 
-
     log_stack:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         LOG_STACK()
         pop
         exit jump
     log_stack_offset:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         LOG_PARSE_IDX()
@@ -201,19 +196,18 @@
         pop
         exit jump
     revert_arg:
-        pop // [length, prefix, offset]
+        pop                                   // [length, prefix, offset]
         dup4
         0xC add
         LOG_PARSE_ARG()
         0x1 0xFF shl or
         0x4 mstore
-        0x24 0x0 revert // RevertDebug
-
+        0x24 0x0 revert                       // RevertDebug
 
     exit:
         // [length, prefix, offset]
-        swap2 // [offset,  prefix, length]
-        pop // [ prefix, length]
-        pop // [ length]
+        swap2                                 // [offset, prefix, length]
+        pop                                   // [prefix, length]
+        pop                                   // [length]
         0xC add
 }

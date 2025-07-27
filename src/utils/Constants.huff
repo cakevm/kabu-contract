@@ -1,0 +1,47 @@
+// =============================================================================
+// GLOBAL CONSTANTS
+// =============================================================================
+// Shared constants used across the Kabu multicaller contract
+// =============================================================================
+
+// Uniswap V2 fee constant (9970/10000 = 0.3% fee)
+#define constant _UNI2_FEE_CONSTANT = 0x26F2  // 9970
+
+// Fee divisor (10000 basis points)
+#define constant _FEE_DIVISOR = 0x2710  // 10000
+
+// Common offset values
+#define constant _OFFSET_32 = 0x20
+#define constant _OFFSET_64 = 0x40
+#define constant _OFFSET_96 = 0x60
+#define constant _OFFSET_128 = 0x80
+#define constant _OFFSET_160 = 0xA0
+#define constant _OFFSET_192 = 0xC0
+#define constant _OFFSET_224 = 0xE0
+
+// Memory slot for temporary storage
+#define constant _TEMP_MEMORY_SLOT = 0x100
+
+// Gas safety buffer for calls
+#define constant _GAS_SAFETY_BUFFER = 0x1388  // 5000
+
+// Stack operation constants
+#define constant _STACK_WORD_SIZE = 0x20  // 32 bytes
+#define constant _STACK_SHIFT = 0x5       // bit shift for 32-byte words
+
+// Call encoding constants
+#define constant _CALL_OFFSET_BYTES = 0x14    // 20 bytes
+#define constant _CALL_DATA_OFFSET = 0x20     // 32 bytes
+#define constant _CALL_PREFIX_OFFSET = 0xC    // 12 bytes
+
+// Bit shift amounts
+#define constant _SHIFT_160 = 0xA0
+#define constant _SHIFT_192 = 0xC0
+#define constant _SHIFT_200 = 0xC8
+#define constant _SHIFT_224 = 0xE0
+#define constant _SHIFT_240 = 0xF0
+#define constant _SHIFT_248 = 0xF8
+
+// Signature sizes
+#define constant _FUNC_SIG_SIZE = 0x4
+#define constant _SELECTOR_SIZE = 0x20

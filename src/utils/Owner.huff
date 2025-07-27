@@ -1,12 +1,24 @@
 #include "Error.huff"
 
+// =============================================================================
+// OWNER ACCESS CONTROL
+// =============================================================================
+// Provides owner-only access control for sensitive operations
+// Note: Currently uses tx.origin - consider using msg.sender for better security
+// =============================================================================
+
+// TODO: Replace with actual owner address before production deployment
+#define constant _OWNER_ADDRESS = 0x1111111111111111111111111111111111111111
+
 #define macro CHECK_OWNER() = takes(0) returns(0) {
-  origin
-  dup1 0x1111 eq owner_ok jumpi
+  caller                         // [msg.sender]
+  [_OWNER_ADDRESS]              // [owner, msg.sender]
+  eq owner_ok jumpi             // Check if caller is owner
   
-  __RIGHTPAD(0x4E4F)
+  // Revert with "NO" error message
+  __RIGHTPAD(0x4E4F)           // "NO" 
   0x2
   PANIC()
+  
   owner_ok:
-  pop
 }

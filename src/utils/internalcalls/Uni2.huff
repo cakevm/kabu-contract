@@ -1,4 +1,5 @@
 #include "../Log.huff"
+#include "../Constants.huff"
 
 #define macro UNI2_RESERVES() = takes(1) returns(2) {
     // Static Call token.balanceOf(address(this))
@@ -43,12 +44,12 @@
 #define macro UNI2_GET_AMOUNT_IN() = takes(4) returns(1) {
     // [reserveIn, reserveOut, amountOut, comms]
     dup3 mul
-    0x2710 mul  // [numerator, reserveOut, amountOut, comms]
-    swap2       // [amountOut, reserveOut, numerator, comms]
-    swap1 sub   // [reserveOut - amountOut, numerator, comms]
+    [_FEE_DIVISOR] mul  // [numerator, reserveOut, amountOut, comms]
+    swap2               // [amountOut, reserveOut, numerator, comms]
+    swap1 sub           // [reserveOut - amountOut, numerator, comms]
     swap1
-    swap2       // [comms, reserveOut - amountOut, numerator]
-    mul         // [denominator, numerator]
+    swap2               // [comms, reserveOut - amountOut, numerator]
+    mul                 // [denominator, numerator]
     swap1 div
     0x1 add
 }
@@ -57,15 +58,15 @@
 #define macro UNI2_GET_AMOUNT_OUT() = takes(4) returns(1) {
     // [reserveIn, reserveOut, amountIn, comms]
     swap1
-    swap2           // [amountIn, reserveOut, reserveIn, comms]
-    swap1           // [reserveOut, amountIn, reserveIn, comms]
-    swap3           // [comms, amountIn, reserveIn, reserveOut]
+    swap2                      // [amountIn, reserveOut, reserveIn, comms]
+    swap1                      // [reserveOut, amountIn, reserveIn, comms]
+    swap3                      // [comms, amountIn, reserveIn, reserveOut]
 
-    mul             // [amountInWithFee, reserveIn, reserveOut ]
-    swap2 dup3      // [amountInWithFee, reserveOut, reserveIn, amountInWithFee ]
-    mul             // [numerator, reserveIn, amountInWithFee ]
-    swap2 swap1     // [reserveIn, amountInWithFee, numerator]
-    0x2710 mul add  // [denominator, numerator]
+    mul                        // [amountInWithFee, reserveIn, reserveOut ]
+    swap2 dup3                 // [amountInWithFee, reserveOut, reserveIn, amountInWithFee ]
+    mul                        // [numerator, reserveIn, amountInWithFee ]
+    swap2 swap1                // [reserveIn, amountInWithFee, numerator]
+    [_FEE_DIVISOR] mul add    // [denominator, numerator]
     swap1
     div
     // dup1 0x0 mstore 0x20 0x0 revert
@@ -74,7 +75,7 @@
 
 #define macro UNI2_GET_IN_AMOUNT_FROM_0() = takes(1) returns(1) {
     // [call_data_offset]
-    0x26F2 swap1 
+    [_UNI2_FEE_CONSTANT] swap1 
     UNI2_PARSE_AMOUNT_CALL()
     // [pool, out_amount]
     UNI2_RESERVES() // [reserve0, reserve1, out_amount]
@@ -86,7 +87,7 @@
 
 #define macro UNI2_GET_IN_AMOUNT_FROM_1() = takes(1) returns(1) {
     // [call_data_offset]
-    0x26F2 swap1 
+    [_UNI2_FEE_CONSTANT] swap1 
     UNI2_PARSE_AMOUNT_CALL()
     // [pool, out_amount]
     UNI2_RESERVES() // [reserve0, reserve1, out_amount]
@@ -97,7 +98,7 @@
 
 #define macro UNI2_GET_OUT_AMOUNT_FROM_0() = takes(1) returns(1) {
     // [call_data_offset]
-    0x26F2 swap1 
+    [_UNI2_FEE_CONSTANT] swap1 
     UNI2_PARSE_AMOUNT_CALL() // [pool, out_amount]
 
     UNI2_RESERVES() // [reserve0, reserve1, out_amount]
@@ -109,7 +110,7 @@
 
 #define macro UNI2_GET_OUT_AMOUNT_FROM_1() = takes(1) returns(1) {
     // [call_data_offset]
-    0x26F2 swap1 
+    [_UNI2_FEE_CONSTANT] swap1 
     UNI2_PARSE_AMOUNT_CALL()
     // [pool, out_amount, comms]
     UNI2_RESERVES()       // [reserve0, reserve1, out_amount]

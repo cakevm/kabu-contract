@@ -1,6 +1,8 @@
+#include "../Constants.huff"
+
 #define macro UNI3_SLOT0() = takes(1) returns(0) {
     // Static Call token.balanceOf(address(this))
-    0x100 mload //[mem_offset, pool]
+    [_TEMP_MEMORY_SLOT] mload //[mem_offset, pool]
     __FUNC_SIG("slot0()") dup2 mstore       // [mem_offset]
     0x0                                    // [retSize, mem_offset]
     0x0                                    // [retOffset, retSize, mem_offset]

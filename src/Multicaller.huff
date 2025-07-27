@@ -1,3 +1,11 @@
+// =============================================================================
+// KABU MULTICALLER CONTRACT
+// =============================================================================
+// Main contract for Kabu DEX backrunning bot operations
+// Handles multiple DEX protocol callbacks and batch call execution
+// Written in Huff assembly for maximum gas efficiency
+// =============================================================================
+
 #include "utils/VMStack.huff"
 #include "utils/BalancerV2.huff"
 #include "utils/service/Uni2Service.huff"
@@ -10,18 +18,25 @@
 #include "DelegateCall.huff"
 #include "InternalCall.huff"
 
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+// Bitmasks for extracting call parameters
 #define constant _ADDRESS_MASK               = 0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff
 #define constant _CALL_LENGTH_MASK           = 0x000000000000000000000000000000000000000000000000000000000000ffff
 #define constant _CALL_VALUE_MASK            = 0x000000000000000000000000000000000000000000000000000000000000ffff
+
+// Call type selectors (high 16 bits of encoded call data)
 #define constant _VALUE_CALL_SELECTOR        = 0x0000000000000000000000000000000000000000000000000000000000007ffa
 #define constant _CALCULATION_CALL_SELECTOR  = 0x0000000000000000000000000000000000000000000000000000000000007ffb
 #define constant _ZERO_VALUE_CALL_SELECTOR   = 0x0000000000000000000000000000000000000000000000000000000000007ffc
 #define constant _INTERNAL_CALL_SELECTOR     = 0x0000000000000000000000000000000000000000000000000000000000007ffd
 #define constant _STATIC_CALL_SELECTOR       = 0x0000000000000000000000000000000000000000000000000000000000007ffe
 #define constant _DELEGATE_CALL_SELECTOR     = 0x0000000000000000000000000000000000000000000000000000000000007fff
+
+// ERC1271 signature validation magic values
 #define constant _ERC1271_MAGICVALUE         = 0x20c13b0b
 #define constant _ERC1271_MAGICVALUE_BYTES32 = 0x1626ba7e
-
 
 #define macro CONSTRUCTOR() = takes (0) returns (0) {}
 
@@ -96,7 +111,7 @@
     //CHECK_OWNER()
     calldatasize iszero retexit jumpi
 
-    // Identify which function is being called.
+    // Identify which function is being called
     0x00 calldataload 0xE0 shr
 
     dup1 __FUNC_SIG("doCalls(bytes)")                                        eq docalls          jumpi
@@ -109,13 +124,12 @@
     dup1 __FUNC_SIG("unlockCallback(bytes)")                                 eq uni4docalls      jumpi
     dup1 __FUNC_SIG("swapCallback(uint256,uint256,bytes)")                   eq maverickdocalls  jumpi
 
-
     pop
-    0x64 calldataload // load with offset 100 bytes, data argument from uniswapV2Call
+    0x64 calldataload                        // load with offset 100 bytes, data argument from uniswapV2Call
     dup1 0x80 eq uni2_callback_found jumpi
 
     pop
-    0x44 calldataload // load with offset 68 bytes, data argument from uniswapV3SwapCallback
+    0x44 calldataload                        // load with offset 68 bytes, data argument from uniswapV3SwapCallback
     dup1 0x60 eq uni3docalls jumpi
 
     pop
@@ -133,26 +147,23 @@
     pop
     retexit jump
 
-
     callback_found:
         0x4 add
         execdocalls jump
 
 
     uni2_callback_found:
-
         dup1
         0x4 add 
         calldataload
-        
         0x14 eq uni2quick jumpi
 
         pop
-
         0x24 calldataload
         dup1 iszero uni2secondarg jumpi
         0x20 mstore
         uni2process jump
+
     uni2secondarg:
         pop
         0x44 calldataload
@@ -160,10 +171,8 @@
 
     uni2process:
         0x20 0x0 mstore
-
         0x64 calldataload
         0x4 add
-
         execdocalls jump
 
     balancer2docalls:
@@ -213,14 +222,10 @@
 
     uni3docalls:
         pop
-
         0x44 calldataload 0x4 add
-
         dup1 calldataload
-
         0x14 eq uni3quick jumpi
         pop
-
 
         0x4 calldataload
         0x0 dup2 slt uni3secondarg jumpi
@@ -286,25 +291,21 @@
 
 #define macro DECODE_NEXT_CALL() = takes(1) returns(1) {
     // [offset, offset, buflen]
-    dup1                              // [offset, offset]
-    mload                             // [prefix, offset, offset, buflen]
+    dup1                                      // [offset, offset]
+    mload                                     // [prefix, offset, offset, buflen]
     dup1
-    0xF0 shr                           // [call_mask, prefix, offset, prefix, offset, buflen]
+    0xF0 shr                                  // [call_mask, prefix, offset, prefix, offset, buflen]
 
     dup1 0x8000 and iszero iszero 
     valuecall jumpi
     dup3
 
-
     dup3
     0xB0 shr
     0xFFFFFF and
     SETUP_STACK()
-    
 
-    //nostacksetup: //[prefix >> 192, prefix, offset]
-    [_CALL_VALUE_MASK] and             // [value, offset]
-
+    [_CALL_VALUE_MASK] and                    // [value, offset]
 
     dup1 iszero empty_op_dnc jumpi
     dup1 [_ZERO_VALUE_CALL_SELECTOR]  eq do_zero_call        jumpi
@@ -314,75 +315,74 @@
     dup1 [_INTERNAL_CALL_SELECTOR]    eq do_internal_call    jumpi
     dup1 [_VALUE_CALL_SELECTOR]       eq do_value_call       jumpi
     valuecall:
-        pop                        // [prefix, offset, offset, len]
+        pop                                   // [prefix, offset, offset, len]
         dup1 0xB0 shr
-        0x7FFFFFFFFFFFFFFFFFFF and // [value, prefix, offset, offset, len]
-        swap2 swap1                // [prefix, offset, value, offset, len]
-
+        0x7FFFFFFFFFFFFFFFFFFF and            // [value, prefix, offset, offset, len]
+        swap2 swap1                           // [prefix, offset, value, offset, len]
         DO_CALL()
         exit_dnc jump
-    do_zero_call:
-        pop                        // [prefix, offset, offset, len]
-        0x0 
-        swap2 swap1                // [prefix, offset, 0x0, offset, len]
-        DO_CALL()                  // [newlen, offset, len]
 
+    do_zero_call:
+        pop                                   // [prefix, offset, offset, len]
+        0x0 
+        swap2 swap1                           // [prefix, offset, 0x0, offset, len]
+        DO_CALL()                             // [newlen, offset, len]
         exit_dnc jump
+
     do_value_call:
-        pop // [prefix, offset, offset, len]
+        pop                                   // [prefix, offset, offset, len]
         dup1 
         0xB0 shr
         0xFFFFFF and
         GET_STACK_WORD()
-        swap2 swap1      // [prefix, offset, value, offset, len]
-        DO_CALL()        // [newlen, offset, len]
-
+        swap2 swap1                           // [prefix, offset, value, offset, len]
+        DO_CALL()                             // [newlen, offset, len]
         exit_dnc jump
+
     do_calculation_call:
-        pop // [prefix, offset, offset, len]
-
-        DO_CALCULATION_CALL() // [newlen, offset, len]
+        pop                                   // [prefix, offset, offset, len]
+        DO_CALCULATION_CALL()                 // [newlen, offset, len]
         exit_dnc jump
+
     do_static_call:
-        pop // [prefix, offset, offset, len]
+        pop                                   // [prefix, offset, offset, len]
         DO_STATIC_CALL()
         exit_dnc jump
+
     do_delegate_call:
-        pop // [prefix, offset, offset, len]
+        pop                                   // [prefix, offset, offset, len]
         DO_DELEGATE_CALL()
         exit_dnc jump
+
     do_internal_call:
         pop
         DO_INTERNAL_CALL()
         exit_dnc jump
+
     empty_op_dnc:
         pop
         0xFFFF add
+
     exit_dnc:
 }
 
 #define macro DOCALLS() = takes(1) returns(0) {
     // [offset]
-    dup1 calldataload   // [len, offset]
-    dup1 swap2          // swap2
- 
-    0x20 add            // [offset+20, len, offset]
+    dup1 calldataload                         // [len, offset]
+    dup1 swap2                                // swap2
+    0x20 add                                  // [offset+20, len, offset]
     0x120
-    calldatacopy        // [offset]
+    calldatacopy                              // [offset]
     msize 0x100 mstore
- 
-    0x120 add           // [len+100, ]
-    0x120               // [counter, len+100]
+    0x120 add                                 // [len+100, ]
+    0x120                                     // [counter, len+100]
 
     nextdc:
-        dup1               // [counter, counter, len]
-
-        DECODE_NEXT_CALL() // [newlen, counter, len]
- 
-        add                // [counter, len]
-
-        dup2               // [len, counter, len]
-        dup2               // [counter, len, counter, len]
+        dup1                                  // [counter, counter, len]
+        DECODE_NEXT_CALL()                    // [newlen, counter, len]
+        add                                   // [counter, len]
+        dup2                                  // [len, counter, len]
+        dup2                                  // [counter, len, counter, len]
         lt nextdc jumpi
 
     exit:
