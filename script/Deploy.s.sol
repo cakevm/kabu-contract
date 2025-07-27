@@ -6,8 +6,6 @@ import "forge-std/Script.sol";
 
 contract Deploy is Script {
     function run() external returns (address deployedAddress) {
-        deployedAddress = HuffNeoDeployer.config()
-            .set_broadcast(true)
-            .deploy("src/Multicaller.huff");
+        deployedAddress = HuffNeoDeployer.config().set_broadcast(true).deploy("src/Multicaller.huff");
     }
 }
